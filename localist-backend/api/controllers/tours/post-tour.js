@@ -12,7 +12,7 @@ module.exports = {
 			description : 'Title of the tour'
 		},
 
-		guide_id            : {
+		user_key            : {
 			required    : true,
 			type        : 'string',
 			description :
@@ -52,6 +52,11 @@ module.exports = {
 				'{"city" : "the city of tour","country": "the country of tour", "lattitude", "lat of tour", "longitude", "long of tour"}'
 		},
 
+		coordinates         : {
+			required : false,
+			type     : 'json'
+		},
+
 		category            : {
 			required    : true,
 			type        : 'string',
@@ -75,6 +80,12 @@ module.exports = {
 			type        : 'string',
 			description :
 				'Any additional comments the guide wants to add to be more informative to the tourist'
+		},
+
+		guests              : {
+			required    : true,
+			type        : 'json',
+			description : 'the range of number of guests allowed on tour'
 		}
 	},
 
@@ -104,44 +115,50 @@ module.exports = {
 		var database = firebase.database()
 		var toursRefLong = database.ref('tours_long')
 		var toursRefShort = database.ref('tours_short')
+		var coord = inputs.coordinates || ''
 
-		var image = inputs.main_image || ''
-		var images = inputs.images || ''
-		var tag = inputs.tags || ''
-		var comments = inputs.additional_comments || ''
+		try {
+			var long_tour = await toursRefLong.push({
+				tour_description    : inputs.tour_description,
+				additional_comments :
+					inputs.additional_comments || '',
+				images              : inputs.images || ''
+			})
 
-		var short_tour = await toursRefLong.push({
-			coordinates         : {
-				lat  : inputs.location.lattitude,
-				long : inputs.location.longitude
-			},
-			tour_description    : inputs.tour_description,
-			additional_comments : comments,
-			images              : images,
-			is_public           : false
-		})
+			var short_tour = await toursRefShort.push({
+				title       : inputs.title,
+				user_key    : inputs.user_key,
+				price       : {
+					low  : inputs.price.low,
+					high : inputs.price.high
+				},
+				duration    : {
+					short : inputs.duration.short,
+					long  : inputs.duration.long
+				},
+				main_image  : inputs.main_image || '',
+				location    : {
+					city    : inputs.location.city,
+					country : inputs.location.country
+				},
+				coordinates : {
+					lattitude : coord.lattitude || '',
+					longitude : coord.longitude || ''
+				},
+				tags        : inputs.tags || '',
+				category    : inputs.category,
+				long_id     : long_tour.key,
+				is_public   : false,
+				guests      : {
+					high : inputs.guests.high,
+					low  : inputs.guests.low
+				}
+			})
+		} catch (error) {
+			console.log(error)
+			return this.res.status(400).send('Error')
+		}
 
-		var long_tour = await toursRefShort.push({
-			title      : inputs.title,
-			guide_id   : inputs.guide_id,
-			price      : {
-				low  : inputs.price.low,
-				high : inputs.price.high
-			},
-			duration   : {
-				short : inputs.duration.short,
-				long  : inputs.duration.long
-			},
-			main_image : image,
-			location   : {
-				city    : inputs.location.city,
-				country : inputs.location.country
-			},
-			tags       : tag,
-			category   : inputs.category,
-			long_id    : short_tour.key
-		})
-
-		this.res.status(201).json({ id: long_tour.key })
+		this.res.status(200).json({ id: short_tour.key })
 	}
 }

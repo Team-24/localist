@@ -26,20 +26,24 @@ module.exports = {
 		// Initialize Firebase
 		var firebase = require('../../database/firebase.js')
 		var database = firebase.database()
-		var toursRefLong = database.ref('tours_long')
 		var toursRefShort = database.ref('tours_short')
 
+		// Array of all the tours to return
 		var returnArr = []
 
-		await toursRefShort.once('value').then(function (snapshot){
-			snapshot.forEach(function (childSnapshot){
-				var item = childSnapshot.val()
-				item.key = childSnapshot.key
+		try {
+			await toursRefShort.once('value').then(function (snapshot){
+				snapshot.forEach(function (childSnapshot){
+					var item = childSnapshot.val()
+					item.key = childSnapshot.key
 
-				returnArr.push(item)
+					returnArr.push(item)
+				})
 			})
-		})
+		} catch (error) {
+			return this.res.status(400).send('error')
+		}
 
-		this.res.json(returnArr)
+		this.res.status(200).json(returnArr)
 	}
 }

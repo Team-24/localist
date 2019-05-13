@@ -8,11 +8,13 @@ import Tours from '@/components/Tours.vue'
 import Guides from '@/components/Guides.vue'
 import SingleGuide from '../components/SingleGuide'
 import SingleTour from '../components/SingleTour'
-import CreateGuide from '../components/CreateGuide'
 import CreateTour from '../components/CreateTour'
 import Admin from '../components/Admin'
 import EditTour from '../components/EditTour'
 import EditGuide from '../components/EditGuide'
+import Profile from '../components/Profile'
+import test from '../components/test'
+import Signintest from '../components/Signintest'
 
 Vue.use(VueRouter)
 const router = new VueRouter({
@@ -47,14 +49,6 @@ const router = new VueRouter({
 			component : Guides
 		},
 		{
-			path      : '/guides/createguide',
-			name      : 'createGuide',
-			component : CreateGuide,
-			meta      : {
-				requiresAuth : true
-			}
-		},
-		{
 			path      : '/tours/createtour',
 			name      : 'createTour',
 			component : CreateTour,
@@ -86,6 +80,21 @@ const router = new VueRouter({
 			path      : 'admin',
 			name      : 'Admin',
 			component : Admin
+		},
+		{
+			path      : '/test',
+			name      : 'test',
+			component : test
+		},
+		{
+			path      : '/signintest',
+			name      : 'Signintest',
+			component : Signintest
+		},
+		{
+			path      : '/profile',
+			name      : 'profile',
+			component : Profile
 		},
 		{
 			path     : '*',

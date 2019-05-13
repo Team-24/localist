@@ -1,70 +1,61 @@
 <template>
-    <div class="container" id="container" ref="container">
-        <div class="form-container sign-up-container">
-            <form v-on:submit.prevent="signUp">
-                <h1>Create Account</h1>
-                <div class="social-container">
-                    <a href="#" class="social">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social">
-                        <i class="fab fa-google-plus-g"></i>
-                    </a>
-                    <a href="#" class="social">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-                <span>or use your email for registration</span>
-                <div>
-                    <input type="text" placeholder="Name" v-model="name">
+    <div class="cont">
+        <div class="container" id="container" ref="container">
+            <div class="form-container sign-up-container">
+                <form v-on:submit.prevent="signUp">
+                    <h1>Sign Up</h1>
+                    <br>
+                    <div>
+                        <input type="email" placeholder="Email" v-model="email">
+                        <input type="password" placeholder="Password" v-model="password">
+                        <input type="password" placeholder="Confirm Password" v-model="confirm">
+                        <!--   <div>
+                            <input
+                                type="checkbox"
+                                value=" "
+                                @click="administration = !administration"
+                                class="form-check-input"
+                                id="administration"
+                            >
+                        </div>
+                        <label class="form-check-label" for="administration">make me admin</label>-->
+                    </div>
+                    <br>
+                    <button pt-2 class="cyan darken-2 white--text" type="submit">Sign Up</button>
+                </form>
+            </div>
+            <div class="form-container sign-in-container">
+                <form v-on:submit.prevent="signIn">
+                    <h1>Sign In</h1>
+                    <br>
                     <input type="email" placeholder="Email" v-model="email">
                     <input type="password" placeholder="Password" v-model="password">
-                    <div>
-                        <input
-                            type="checkbox"
-                            value=" "
-                            @click="administration = !administration"
-                            class="form-check-input"
-                            id="administration"
-                        >
+                    <a href="#">Forgot your password?</a>
+                    <button class="cyan darken-2 white--text" type="submit">Sign In</button>
+                </form>
+            </div>
+            <div class="overlay-container">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-left">
+                        <h1 class="white-shadow">Welcome Back!</h1>
+                        <p
+                            class="white-shadow"
+                        >To keep connected with us please login with your personal info</p>
+                        <button
+                            class="ghost cyan darken-2 white--text"
+                            @click="signInButton"
+                            id="signIn"
+                        >Sign In</button>
                     </div>
-                    <label class="form-check-label" for="administration">make me admin</label>
-                </div>
-                <button type="submit">Sign Up</button>
-            </form>
-        </div>
-        <div class="form-container sign-in-container">
-            <form v-on:submit.prevent="signIn">
-                <h1>Sign in</h1>
-                <div class="social-container">
-                    <a href="#" class="social">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" class="social">
-                        <i class="fab fa-google-plus-g"></i>
-                    </a>
-                    <a href="#" class="social">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                </div>
-                <span>or use your account</span>
-                <input type="email" placeholder="Email" v-model="email">
-                <input type="password" placeholder="Password" v-model="password">
-                <a href="#">Forgot your password?</a>
-                <button type="submit">Sign In</button>
-            </form>
-        </div>
-        <div class="overlay-container">
-            <div class="overlay">
-                <div class="overlay-panel overlay-left">
-                    <h1>Welcome Back!</h1>
-                    <p>To keep connected with us please login with your personal info</p>
-                    <button class="ghost" @click="signInButton" id="signIn">Sign In</button>
-                </div>
-                <div class="overlay-panel overlay-right">
-                    <h1>Hello, Friend!</h1>
-                    <p>Sign up NOW!</p>
-                    <button class="ghost" @click="signUpButton" id="signUp">Sign Up</button>
+                    <div class="overlay-panel overlay-right">
+                        <h1 class="white-shadow">Hello, Friend!</h1>
+                        <p class="white-shadow">Sign up NOW!</p>
+                        <button
+                            class="ghost cyan darken-2 white--text"
+                            @click="signUpButton"
+                            id="signUp"
+                        >Sign Up</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -78,9 +69,7 @@ export default {
     name: "Signin",
     data: () => ({
         email: "",
-        password: "",
-        name: "",
-        administration: false
+        password: ""
     }),
     props: {
         msg: String
@@ -90,27 +79,18 @@ export default {
             var r = this;
             const formData = {
                 email: this.email,
-                password: this.password,
-                name: this.name,
-                administration: this.administration
+                password: this.password
             };
             this.$http
-                .post("/entrance/signup", formData)
+                .post("/user/signup", formData)
                 .then(function(response) {
                     if (response.data.error) {
                         alert(response.data.error.message);
                     } else {
-                        r.$store.commit(
-                            "setUsername",
-                            response.data.user.user.email
-                        );
                         r.$store.commit("setCurrentUser", response.data.user);
-                        r.$store.commit("setCurrentToken", response.data.token);
-                        r.$store.commit("setUserId", response.data.uid);
-                        if (response.data.administration) {
-                            r.$store.commit("setAdminStatus", true);
-                        }
-                        router.push("/");
+                        r.$store.commit("setUserKey", response.data.key);
+
+                        router.push("/profile");
                     }
                 })
                 .catch(function(error) {
@@ -124,7 +104,7 @@ export default {
                 password: this.password
             };
             this.$http
-                .post("/entrance/signin", formData)
+                .post("/user/signin", formData)
                 .then(function(response) {
                     if (response.data.error) {
                         alert(response.data.error.message);
@@ -135,10 +115,8 @@ export default {
                         );
                         r.$store.commit("setCurrentUser", response.data.user);
                         r.$store.commit("setCurrentToken", response.data.token);
-                        r.$store.commit("setUserId", response.data.uid);
-                        if (response.data.administration) {
-                            r.$store.commit("setAdminStatus", true);
-                        }
+                        r.$store.commit("setUserKey", response.data.key);
+
                         router.push("/");
                     }
                 })
@@ -160,6 +138,15 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.cont {
+    padding-top: 65px;
+
+
+    background-image: url("https://images.unsplash.com/photo-1473186578172-c141e6798cf4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1866&q=80");
+    background-size: 100%;
+    background-position: 100% 25%;
+}
+
 @media screen and (max-width: 400px) {
 }
 
@@ -196,8 +183,6 @@ a {
 button {
     border-radius: 20px;
     border: 1px solid #fded2a;
-    background-color: #fded2a;
-    color: #343009;
     font-size: 12px;
     font-weight: bold;
     padding: 12px 45px;
@@ -220,7 +205,8 @@ button.ghost {
 }
 
 form {
-    background-color: #fffcdc;
+    background-color: #e2ecf0;
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -231,7 +217,7 @@ form {
 }
 
 input {
-    background-color: #eee;
+    background-color: white;
     border: none;
     padding: 12px 15px;
     margin: 8px 0;
@@ -254,14 +240,18 @@ input {
 }
 
 .container {
-    background-color: #fffcdc;
+    padding-top: 10%;
+
     border-radius: 10px;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 1), 0 10px 10px rgba(0, 0, 0, 0.22);
     position: relative;
     overflow: hidden;
     width: 768px;
     max-width: 100%;
+
     min-height: 480px;
+    z-index: 5;
+    /*min-height: 480px;*/
 }
 
 .form-container {
@@ -325,16 +315,16 @@ input {
 }
 
 .overlay {
-    background: #1e9600;
+    /*background: #1e9600;*/
     /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #ff0000, #fff200, #1e9600);
+    /*background: -webkit-linear-gradient(to right, #ff0000, #fff200, #1e9600);*/
     /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #ff0000, #fff200, #1e9600);
+    /*background: linear-gradient(to right, #ff0000, #fff200, #1e9600);*/
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     background-repeat: no-repeat;
     background-size: cover;
     background-position: 0 0;
-    color: #343009;
+    /*color: #343009;*/
     position: relative;
     left: -100%;
     height: 100%;
@@ -376,5 +366,9 @@ input {
 
 .container.right-panel-active .overlay-right {
     transform: translateX(20%);
+}
+
+.white-shadow {
+    text-shadow: 1px 1px 2px white;
 }
 </style>

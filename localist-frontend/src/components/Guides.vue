@@ -1,7 +1,7 @@
 <template>
     <div id="guideList">
         <h1>Guides</h1>
-        <router-link class="button" to="guides/createguide">Create Guide</router-link>
+        
         <div class="container">
             <div class="row">
                 <div
@@ -23,6 +23,7 @@
                                 class="card-title"
                             >{{guide.info.first_name}} {{guide.info.last_name}}</h5>
                             <h6>{{guide.info.city}}, {{guide.info.country}}</h6>
+                            <h1>{{guide.info.gender}}</h1>
                             <router-link
                                 class="btn btn-primary"
                                 :to="'/guides/single/' + guide.key"

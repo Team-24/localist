@@ -2,7 +2,9 @@
     <div>
         <v-content>
           <section>
-            <v-parallax src="https://images.unsplash.com/photo-1473186578172-c141e6798cf4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1866&q=80" height="550">
+            <v-parallax 
+              :src="require('@/assets/background-1.jpeg')" 
+              height="650">
               <v-layout
                 column
                 align-center
@@ -13,29 +15,45 @@
                 <div class="cyan--text text--darken-2 subheading mb-5 text-xs-center">by TEAM 24</div>
                 
             <v-layout row wrap justify-space-around >
-                <v-flex md3>
+                <v-flex xs12 md4>
+                  <v-text-field
+                      background-color="white"
+                      v-model="search"
+                      label="Search"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs12 md3>
+                  <v-menu
+                      v-model="menu"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      lazy
+                      transition="scale-transition"
+                      offset-y
+                      full-width
+                      min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                        <v-text-field
+                            v-model="date"
+                            readonly
+                            v-on="on"
+                            background-color="white"
+                        ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="date" @input="menu = false" no-title></v-date-picker>
+                  </v-menu>
+                </v-flex>
+                <v-flex xs12 md3>
                     <v-text-field
-                        label="What"
-                        solo
+                            v-model="guest"
+                            type="number"
+                        label="#. of guest"
                         background-color="white"
                     ></v-text-field>
                 </v-flex>
-                <v-flex md3>
-                    <v-text-field
-                        label="When"
-                        solo
-                        background-color="white"
-                    ></v-text-field>
-                </v-flex>
-                <v-flex md3>
-                    <v-text-field
-                        label="#. of travellers"
-                        solo
-                        background-color="white"
-                    ></v-text-field>
-                </v-flex>
-                <v-flex md12>
-                    <v-btn large class="cyan darken-2 white--text"> Search </v-btn>
+                <v-flex md12 ma-0>
+                    <v-btn @click="addSearch" large class="cyan darken-2 white--text"> Search </v-btn>
                 </v-flex>
             </v-layout>
 
@@ -50,9 +68,13 @@
               class="my-5"
               align-center
             >
-              <v-flex xs12 sm4 class="my-3">
+              <v-flex xs12 sm4 
+                class="my-3"
+              >
                 <div class="text-xs-center">
-                  <h2 class="headline">Probably, the BEST way to experience the local culture.</h2>
+                  <h2 class="headline">
+                    The BEST way to experience local culture.
+                  </h2>
                 </div>
               </v-flex>
               <v-flex xs12>
@@ -61,15 +83,15 @@
                     <v-flex xs12 md4>
                       <v-card class="elevation-0 transparent">
                         <v-card-text class="text-xs-center">
-                          <v-icon x-large class="cyan--text text--darken-2">color_lens</v-icon>
+                          <v-icon x-large 
+                            class="cyan--text text--darken-2">color_lens
+                          </v-icon>
                         </v-card-text>
                         <v-card-title primary-title class="layout justify-center">
                           <div class="headline text-xs-center">Customizable</div>
                         </v-card-title>
                         <v-card-text>
-                          Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare. 
-                          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                          Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti. 
+                          We are huge believers in customized experiences, and bringing unique memories home with you, wherever you go.  You needs and interests aren't the same as anyone elses, so why look for the same experiences? We support guide-to-tourist communication, so that everyone involved can be certain of what is going to work best for them.
                         </v-card-text>
                       </v-card>
                     </v-flex>
@@ -82,9 +104,7 @@
                           <div class="headline">Fun</div>
                         </v-card-title>
                         <v-card-text>
-                          Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare. 
-                          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                          Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti. 
+                            There's no point in travelling if you aren't going to have some fun, right?  Find independent, local experts in your travel destination.  There's no doubt that the people who are passionate about their home will want to share all the fun that is to be had there with you!  Find your the people that share your niche with you!
                         </v-card-text>
                       </v-card>
                     </v-flex>
@@ -97,9 +117,7 @@
                           <div class="headline text-xs-center">Secured</div>
                         </v-card-title>
                         <v-card-text>
-                          Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare. 
-                          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                          Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti. 
+                          We stand behind our guides 100%.  We believe in care-free travelling, that should concern you is showing up on time and having fun, or seeing what you came to see!  Our secure payment process is risk-free, quick, and allows you to worry about what's important; having a great experience.
                         </v-card-text>
                       </v-card>
                     </v-flex>
@@ -110,9 +128,16 @@
           </section>
 
           <section>
-            <v-parallax src="https://images.unsplash.com/photo-1530735606451-8f5f13955328?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80" height="380">
+            <v-parallax 
+              :src="require('@/assets/background-2.jpeg')" 
+              height="380"
+            >
               <v-layout column align-center justify-center>
-                <div class="headline white--text font-weight-black mb-3 text-xs-center">Custom local tour that cannot find in traditional tourist means.</div>
+                <div class="headline white--text font-weight-black mb-3 text-xs-center">
+                    <span class="black-shadow">
+                        Custom local experiences that can't be found anywhere else.
+                    </span>
+                </div>
                 <v-btn
                   class="cyan darken-2 mt-5 font-weight-black"
                   dark
@@ -134,9 +159,7 @@
                       <div class="headline">Our Story</div>
                     </v-card-title>
                     <v-card-text>
-                      Localist is ... mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare. 
-                      Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. 
-                      Nullam in aliquet odio. Aliquam eu est vitae tellus bibendum tincidunt. Suspendisse potenti. 
+                      Team24 is a company made of 4 developers and travelers, all with a common goal: to make experiences cheaper, more enjoyable, and more available for everyone.  Localist is the product child of a vision where the tourism industry is given back to the person that has all the local knowledge: you, the localist.
                     </v-card-text>
                   </v-card>
                 </v-flex>
@@ -146,8 +169,8 @@
                       <div class="headline">Contact us</div>
                     </v-card-title>
                     <v-card-text>
-                      Cras facilisis mi vitae nunc lobortis pharetra. Nulla volutpat tincidunt ornare.
                     </v-card-text>
+<!--
                     <v-list class="transparent">
                       <v-list-tile>
                         <v-list-tile-action>
@@ -156,7 +179,8 @@
                         <v-list-tile-content>
                           <v-list-tile-title>604-123-4567</v-list-tile-title>
                         </v-list-tile-content>
-                      </v-list-tile>
+-->
+                      <!-- </v-list-tile> -->
                       <v-list-tile>
                         <v-list-tile-action>
                           <v-icon class="blue--text text--lighten-2">place</v-icon>
@@ -170,10 +194,10 @@
                           <v-icon class="blue--text text--lighten-2">email</v-icon>
                         </v-list-tile-action>
                         <v-list-tile-content>
-                          <v-list-tile-title>team24@localist.com</v-list-tile-title>
+                          <v-list-tile-title href='&#109;ailt&#111;&#58;%6&#67;%6&#70;&#99;a&#108;&#105;s&#116;&#64;&#37;6C&#37;6Fc&#97;&#108;i&#37;73%74%2E&#99;o&#109;'>loc&#97;list&#64;loc&#97;lis&#116;&#46;com</v-list-tile-title>
                         </v-list-tile-content>
                       </v-list-tile>
-                    </v-list>
+                    <!-- </v-list> -->
                   </v-card>
                 </v-flex>
               </v-layout>
@@ -184,10 +208,41 @@
 </template>
 
 <script>
+  import router from "../router";
+  export default {
+
+    data: () => ({
+
+        date: new Date().toISOString().substr(0, 10),
+        search: '',
+        guest: '',
+        menu: false,
+        modal: false,
+        searchInput:[
+          { searchTitle:'',
+            searchDate:'',
+            searchGuest:''}
+        ]
+    }),
+    methods:{
+      addSearch(){
+
+        this.$store.commit("setSearchTitle", this.search);
+        this.$store.commit("setSearchDate", this.date);
+        this.$store.commit("setSearchGuest", this.guest);
+        this.console.log(this.search);
+        this.console.log(this.date);
+        this.console.log(this.guest);
+        router.push("/tours");
+      }
+    }
+  };
 </script>
 
 <style>
-
+    .black-shadow{
+        text-shadow: 1px 1px 2px black; 
+    }
 </style>
 
 

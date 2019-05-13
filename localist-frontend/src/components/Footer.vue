@@ -6,12 +6,6 @@
                     Anyone can become a local guide and sell their experiences. <br>
                     Anyone can quickly get a custom local tour that cannot find in traditional tourist means.
                 </v-card-text>
-
-                <v-divider></v-divider>
-
-                <v-card-text class="white--text">
-                    &copy; {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
-                </v-card-text>
             </v-flex>
 
         </v-layout>

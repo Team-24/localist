@@ -1,7 +1,7 @@
 module.exports = {
-	friendlyName        : 'Signup',
+	friendlyName        : 'Signin',
 
-	description         : 'Sign up for a new user account.',
+	description         : 'Sign in to account.',
 
 	extendedDescription : `This creates a new user record in the database, signs in the requesting user agent
 by modifying its [session](https://sailsjs.com/documentation/concepts/sessions), and
@@ -12,7 +12,7 @@ until they confirm they are using a legitimate email address (by clicking the li
 the account verification message.)`,
 
 	inputs              : {
-		email          : {
+		email    : {
 			required            : true,
 			type                : 'string',
 			isEmail             : true,
@@ -21,33 +21,19 @@ the account verification message.)`,
 			extendedDescription : 'Must be a valid email address.'
 		},
 
-		password       : {
+		password : {
 			required    : true,
 			type        : 'string',
 			maxLength   : 200,
 			example     : 'passwordlol',
 			description :
 				'The unencrypted password to use for the new account.'
-		},
-
-		name           : {
-			required    : true,
-			type        : 'string',
-			maxLength   : 200,
-			example     : 'Jacob Smith',
-			description : 'Your name.'
-		},
-
-		administration : {
-			required    : true,
-			type        : 'boolean',
-			description : 'is Admin?.'
 		}
 	},
 
 	exits               : {
 		success           : {
-			description : 'New user account was created successfully.'
+			description : 'Signed in successfully.'
 		},
 
 		invalid           : {
@@ -68,52 +54,39 @@ the account verification message.)`,
 	fn                  : async function (inputs){
 		// Initialize Firebase
 		var firebase = require('../../database/firebase.js')
-		var database = firebase.database()
 		var admin = require('../../database/admin.js')
-		var r = this.res
 		var userData = {
-			uid            : '',
-			token          : '',
-			administration : inputs.administration,
+			administration : false,
 			user           : ''
 		}
 
-		console.log('creating user...')
-		await firebase
-			.auth()
-			.createUserWithEmailAndPassword(
-				inputs.email,
-				inputs.password
-			)
-			.then((authData) => {
-				userData.user = authData
-				console.log('User created successfully')
-				return firebase.auth().currentUser.getIdToken(false)
-			})
-			.then(function (idToken){
-				userData.token = idToken
-				return firebase.auth().currentUser.uid
-			})
-			.then(function (uid){
-				userData.uid = uid
-				var newUser = database.ref('users').push(uid)
-				newUser.set({
-					uid  : userData.uid,
-					name : inputs.name
+		try {
+			await firebase
+				.auth()
+				.signInWithEmailAndPassword(
+					inputs.email,
+					inputs.password
+				)
+				.then(function (firebaseUser){
+					userData.user = firebaseUser
+					return firebase
+						.auth()
+						.currentUser.getIdToken(false)
 				})
-				if (inputs.administration) {
+				.then(function (idToken){
+					userData.token = idToken
 					return admin
 						.auth()
-						.setCustomUserClaims(uid, {
-							admin : true
-						})
-				}
-			})
-			.catch(function (error){
-				r.json({ error: error })
-				return
-			})
-
-		this.res.json(userData)
+						.verifyIdToken(userData.token)
+				})
+				.then(function (claims){
+					if (claims.admin === true) {
+						userData.administration = true
+					}
+				})
+		} catch (error) {
+			return this.res.status(400).send('Invalid email or password')
+		}
+		this.res.status(200).json(userData)
 	}
 }

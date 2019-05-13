@@ -26,27 +26,32 @@ module.exports = {
 		// Initialize Firebase
 		var firebase = require('../../database/firebase.js')
 		var database = firebase.database()
-		var toursRefLong = database.ref('tours_short/' + this.req.params.id)
+		var toursRefLong = database.ref('tours_short/' + this.req.params.key)
 
 		var addLongTour = this.req.params.long
-		var long_key = ''
 		var tour = {}
 
-		await toursRefLong.once('value').then(function (snapshot){
-			long_key = snapshot.val().long_id
-			tour = snapshot.val()
-		})
+		try {
+			var long_key = ''
 
-		if (addLongTour == 'true') {
-			await database
-				.ref('tours_long/' + long_key)
-				.once('value')
-				.then(function (snapshot){
-					tour = { ...tour, ...snapshot.val() }
-				})
+			await toursRefLong.once('value').then(function (snapshot){
+				long_key = snapshot.val().long_id
+				tour = snapshot.val()
+			})
+
+			if (addLongTour == 'true') {
+				await database
+					.ref('tours_long/' + long_key)
+					.once('value')
+					.then(function (snapshot){
+						tour = { ...tour, ...snapshot.val() }
+					})
+			}
+		} catch (error) {
+			return this.res.status(404).send('tour not found')
 		}
 
 		delete tour.long_id
-		this.res.send(tour)
+		this.res.status(200).send(tour)
 	}
 }

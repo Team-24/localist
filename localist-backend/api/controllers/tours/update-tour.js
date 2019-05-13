@@ -74,6 +74,12 @@ module.exports = {
 			required    : false,
 			type        : 'string',
 			description : 'Additional comments of the tour'
+		},
+
+		guests              : {
+			required    : true,
+			type        : 'json',
+			description : 'the range of number of guests allowed on tour'
 		}
 	},
 
@@ -95,48 +101,70 @@ module.exports = {
 		var database = firebase.database()
 		var toursRefShort = database.ref('tours_short')
 		var toursRefLong = database.ref('tours_long')
-		var short_key = this.req.params.id
-		var long_key = ''
-		var tag = inputs.tags || ''
-		var main_image = inputs.main_image || ''
-		var additional_comments = inputs.additional_comments || ''
-		var images = inputs.images || ''
+		var short_key = this.req.params.key
 
-		await toursRefShort
-			.child(short_key)
-			.once('value')
-			.then(function (snapshot){
-				long_key = snapshot.val().long_id
-			})
-
-		await toursRefShort.child(short_key).update({
-			title      : inputs.title,
-			duration   : {
-				short : inputs.duration.short,
-				long  : inputs.duration.long
-			},
-			location   : {
-				city    : inputs.location.city,
-				country : inputs.location.country
-			},
-			price      : {
-				low  : inputs.price.low,
-				high : inputs.price.high
-			},
-			main_image : main_image,
-			tags       : tag,
-			category   : inputs.category
-		})
-
-		await toursRefLong.child(long_key).update({
-			additional_comments : additional_comments,
-			coordinates         : {
-				lat  : inputs.coordinates.lat,
-				long : inputs.coordinates.long
-			},
-			images              : images,
-			tour_description    : inputs.tour_description
-		})
+		try {
+			await toursRefShort
+				.child(short_key)
+				.once('value')
+				.then(function (snapshot){
+					return snapshot.val().long_id
+				})
+				.then(function (long_key){
+					console.log(long_key)
+					toursRefLong.child(long_key).update({
+						additional_comments :
+							inputs.additional_comments ||
+							'',
+						coordinates         : {
+							lat  :
+								inputs.coordinates
+									.lattitude,
+							long :
+								inputs.coordinates
+									.longitude
+						},
+						images              :
+							inputs.images || '',
+						tour_description    :
+							inputs.tour_description
+					})
+					console.log('update long')
+				})
+				.then(function (){
+					toursRefShort.child(short_key).update({
+						title      : inputs.title,
+						duration   : {
+							short :
+								inputs.duration
+									.short,
+							long  : inputs.duration.long
+						},
+						location   : {
+							city    :
+								inputs.location.city,
+							country :
+								inputs.location
+									.country
+						},
+						price      : {
+							low  : inputs.price.low,
+							high : inputs.price.high
+						},
+						main_image : inputs.main_image || '',
+						tags       : inputs.tags || '',
+						category   : inputs.category,
+						guests     : {
+							high : inputs.guests.high,
+							low  : inputs.guests.low
+						}
+					})
+				})
+		} catch (error) {
+			return this.res
+				.status(404)
+				.send('Could not find tour, updated aborted')
+		}
 
 		this.res.status(200).send('Tour updated succesfully')
 	}

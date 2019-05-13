@@ -1,7 +1,7 @@
 module.exports = {
-	friendlyName        : 'Signin',
+	friendlyName        : 'Signup',
 
-	description         : 'Sign in to account.',
+	description         : 'Sign up for a new user account.',
 
 	extendedDescription : `This creates a new user record in the database, signs in the requesting user agent
 by modifying its [session](https://sailsjs.com/documentation/concepts/sessions), and
@@ -33,7 +33,7 @@ the account verification message.)`,
 
 	exits               : {
 		success           : {
-			description : 'Signed in successfully.'
+			description : 'New user account was created successfully.'
 		},
 
 		invalid           : {
@@ -54,36 +54,54 @@ the account verification message.)`,
 	fn                  : async function (inputs){
 		// Initialize Firebase
 		var firebase = require('../../database/firebase.js')
-		var admin = require('../../database/admin.js')
-		var r = this.res
+		var database = firebase.database()
+		// var admin = require('../../database/admin.js')
 		var userData = {
-			uid            : '',
-			token          : '',
-			administration : false,
-			user           : ''
+			key  : '',
+			user : ''
+		}
+
+		// try {
+			await firebase
+				.auth()
+				.createUserWithEmailAndPassword(
+					inputs.email,
+					inputs.password
+				)
+				.then((authData) => {
+					userData.user = authData.user
+					return database.ref('users').push({
+						uid : authData.user.uid
+					})
+				})
+				.then(function (newUser){
+					userData.key = newUser.key
+				})
+		// } catch (error) {
+		// 	return this.res.status(409).send('Email already in use')
+		// }
+
+		var actionCodeSettings = {
+			// URL you want to redirect back to. The domain (www.example.com) for this
+			// URL must be whitelisted in the Firebase Console.
+			url             : 'http://localhost:8080',
+			// This must be true.
+			handleCodeInApp : true
 		}
 
 		await firebase
 			.auth()
-			.signInWithEmailAndPassword(inputs.email, inputs.password)
-			.then(function (firebaseUser){
-				userData.user = firebaseUser
-				userData.uid = firebaseUser.user.uid
-				return firebase.auth().currentUser.getIdToken(false)
-			})
-			.then(function (idToken){
-				userData.token = idToken
-				return admin.auth().verifyIdToken(userData.token)
-			})
-			.then(function (claims){
-				if (claims.admin === true) {
-					userData.administration = true
-				}
+			.sendSignInLinkToEmail(inputs.email, actionCodeSettings)
+			.then(function (){
+				// The link was successfully sent. Inform the user.
+				// Save the email locally so you don't need to ask the user for it again
+				// if they open the link on the same device.
+				console.log('sent')
 			})
 			.catch(function (error){
-				r.json({ error: error })
+				// Some error occurred, you can inspect the code: error.code
 			})
 
-		this.res.json(userData)
+		this.res.status(201).json(userData)
 	}
 }

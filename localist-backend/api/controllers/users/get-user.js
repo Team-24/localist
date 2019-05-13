@@ -1,7 +1,7 @@
 module.exports = {
-	friendlyName        : 'delete-tours',
+	friendlyName        : 'single-guides',
 
-	description         : 'Delete the tour based on the id',
+	description         : 'Return guide based on the id',
 
 	extendedDescription : ``,
 
@@ -9,7 +9,7 @@ module.exports = {
 
 	exits               : {
 		success : {
-			description : 'Tour deleted successfully.'
+			description : 'Guide returned successfully.'
 		},
 
 		invalid : {
@@ -26,14 +26,20 @@ module.exports = {
 		// Initialize Firebase
 		var firebase = require('../../database/firebase.js')
 		var database = firebase.database()
-		var toursRef = database.ref('tours')
+		var guidesRef = database.ref('users')
+		var user = {}
 
 		try {
-			await toursRef.child(this.req.params.key).remove()
+			await guidesRef
+				.child(this.req.params.key)
+				.once('value')
+				.then(function (snapshot){
+					user = snapshot.val()
+				})
 		} catch (error) {
-			return this.res.status(404).send('Tour was not found')
+			return this.res.status(404).send('User not found')
 		}
 
-		this.res.status(200).send('Tour deleted successfully')
+		this.res.status(200).send(user)
 	}
 }

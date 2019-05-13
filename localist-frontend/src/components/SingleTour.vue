@@ -1,24 +1,29 @@
 <template>
     <div id="tourList">
         <v-container fluid grid-list-md>
-            <v-layout row wrap>
-                <v-flex d-flex xs12 sm6 md4>
-                    <v-card color="red" dark>
+            <v-layout column wrap>
+                <v-flex d-flex xs12 sm6 md6>
+                    <v-card tile flat color="white">
+                        <v-card-text>
+                            <img
+                                    src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1053&q=80"
+                                    id="tour-img"
+                            >
+                        </v-card-text>
+                    </v-card>
+                </v-flex>
+                <v-flex>
+                    <v-card flat color="white">
                         <v-card-title primary class="title">{{ info.data && info.data.title }}</v-card-title>
-                        <v-card-text>{{info.data && info.data.description}}</v-card-text>
+                        <v-card-text><img height="40px" src="../assets/img/location.png"/> {{info.data && info.data.location.city}}, {{info.data && info.data.location.country}}</v-card-text>
+                        <v-card-text>{{info.data && info.data.duration.short}} - {{info.data && info.data.duration.long}} hours</v-card-text>
+                        <v-card-text>{{info.data && info.data.tour_description}}</v-card-text>
+                        <v-card-text>Additional Comments: <br>{{info.data && info.data.additional_comments}}</v-card-text>
                     </v-card>
                 </v-flex>
                 <v-flex d-flex xs12 sm6 md5>
                     <v-layout row wrap>
                         <v-flex d-flex>
-                            <v-card dark tile flat color="red lighten-1">
-                                <v-card-text>
-                                    <img
-                                        src="https://images.unsplash.com/photo-1501555088652-021faa106b9b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1053&q=80"
-                                        id="tour-img"
-                                    >
-                                </v-card-text>
-                            </v-card>
                         </v-flex>
                         <v-flex d-flex>
                             <v-layout row wrap>
@@ -44,10 +49,13 @@
                     </v-card>
                 </v-flex>
             </v-layout>
+            <router-link :to="'/tours/edit/' + this.$route.params.id">Edit</router-link>
         </v-container>
 
-        <router-link :to="'/tours/edit/' + this.$route.params.id">Edit</router-link>
-
+        <br>
+        <br>
+        <br>
+        <br>
     </div>
 </template>
 
@@ -58,14 +66,21 @@ export default {
     data: () => ({
         info: ""
     }),
+    computed:{
+        // iconUrl () {
+            // return require('./assets/img/background.jpg')
+            // The path could be '../assets/img.png', etc., which depends on where your vue file is
+        // }
+    },
     mounted() {
         this.$http
-            .get("/tour/find/" + this.$route.params.id)
+            .get("/tour/find/" + this.$route.params.id + "/true")
             .then(response => (this.info = response))
             .catch(error => alert(error))
             .finally(() => (this.loading = false));
     }
 };
+
 </script>
 
 <style scoped>
